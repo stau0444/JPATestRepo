@@ -75,4 +75,5 @@ public interface UserRepository extends JpaRepository<User,Long>{
     @Query(value = "select * from user limit 1",nativeQuery = true)
     Map<String,Object> findRowRecode();
 
+    User findByEmail(String s);
 }

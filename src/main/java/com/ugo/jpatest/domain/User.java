@@ -26,12 +26,13 @@ Entity 객체 살펴보기
         indexes = {@Index(columnList = "name")},
         uniqueConstraints = {@UniqueConstraint(columnNames = {"email"})}
 )
+@EntityListeners(value = TimeStampEntityListener.class)
 //@Table은 테이블 이름 , 스키마 같은 것을 지정해야 할 경우에 사용한다 .
 // name에 지정된 테이블로 해당엔티티가 맵핑된다.
 // indexes = DB index를 지정한다 .
 // uniquerConstraints = 유니크 여러 컬럼에 제약조건을 지정할 때 사용한다 .
 //index 같은 경우에는 DB에 인덱스가 지정되 있지 않다면 동작하지 않는다.
-public class User {
+public class User implements Auditable{
 
     @Id @GeneratedValue
     //@GeneratedValue 의 타입
@@ -70,5 +71,29 @@ public class User {
     private LocalDateTime createdAt;
     //@Column(insertable = false)
     private LocalDateTime updatedAt;
+
+    /*
+        Entity Listener 종류
+        이벤트가 발생하기 직전 혹은 직후에 해당 이벤트 발생을 감지하고 정의한 로직을 처리한다.
+        @PrePersist
+        @PreUpdate
+        @PreRemove
+        @PostPersist
+        @PostUpdate
+        @PostRemove
+        @PostLoad
+     */
+
+
+//    @PrePersist
+//    public void prePersist(){
+//        this.setCreatedAt(LocalDateTime.now());
+//        this.setUpdatedAt(LocalDateTime.now());
+//    }
+//
+//    @PreUpdate
+//    public void preUpdate(){
+//        this.setUpdatedAt(LocalDateTime.now());
+//    }
 
 }

@@ -22,8 +22,7 @@ import javax.transaction.Transactional;
 import java.time.LocalDateTime;
 import java.util.*;
 
-import static org.springframework.data.domain.Sort.Order.asc;
-import static org.springframework.data.domain.Sort.Order.desc;
+import static org.springframework.data.domain.Sort.Order.*;
 
 @SpringBootTest
 class UserRepositoryTest {
@@ -345,6 +344,63 @@ class UserRepositoryTest {
         Map<String, Object> rowRecode = userRepository.findRowRecode();
         Object gender = rowRecode.get("gender");
         System.out.println(gender.toString());
+    }
+
+
+    @Test
+    void entityListenerTest (){
+        User user = new User();
+        user.setName("ugo");
+        user.setEmail("staasd04@gmail.com");
+
+        userRepository.save(user);
+
+        User user2 = userRepository.findById(1L).orElseThrow(RuntimeException::new);
+        user2.setName("ugo222");
+
+        userRepository.save(user2);
+
+        userRepository.deleteById(1L);
+
+    }
+
+
+    @Test
+    void persistTest(){
+        User user = new User();
+        user.setEmail("ugo@gmail.com");
+        user.setName("ugo");
+
+        userRepository.save(user);
+
+        System.out.println(userRepository.findByEmail("ugo@gmail.com"));
+    }
+
+    @Test
+    void preUpdateTest(){
+        //유저 생성
+        User user = new User();
+        user.setEmail("ugo@gmail.com");
+        user.setName("ugo");
+
+        //insert
+        userRepository.save(user);
+
+        //insert된 User의 updatedAt 과 update된 후의 updatedAt 을 비교 해보려 한다.
+        LocalDateTime createdAt = userRepository.findByEmail("ugo@gmail.com").getUpdatedAt();
+        System.out.println("updateAtWhenCreated = " + createdAt);
+
+        //update
+        User byEmail = userRepository.findByEmail("ugo@gmail.com");
+        byEmail.setName("ugogogo");
+        userRepository.save(byEmail);
+
+        //update된 updatedAt
+        LocalDateTime updatedAt = userRepository.findByEmail("ugo@gmail.com").getUpdatedAt();
+
+        System.out.println("updatedAt = " + updatedAt);
+
+        Assertions.assertNotEquals(updatedAt,createdAt);
 
     }
 }
