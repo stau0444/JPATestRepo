@@ -2,12 +2,17 @@ package com.ugo.jpatest.repository;
 
 import com.ugo.jpatest.domain.User;
 import org.apache.tomcat.jni.Local;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import javax.persistence.QueryHint;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 @Repository
@@ -26,6 +31,7 @@ public interface UserRepository extends JpaRepository<User,Long>{
 
     List<User> findByCreatedAtBefore(LocalDateTime localDateTime);
 
+    //graterThan LessThan
     List<User> findByCreatedAtGreaterThan(LocalDateTime localDateTime);
 
     List<User> findByCreatedAtGreaterThanEqual(LocalDateTime localDateTime);
@@ -57,4 +63,16 @@ public interface UserRepository extends JpaRepository<User,Long>{
     //NotEmpty
 
     List<User> findTop3ByNameOrderByIdDesc(String name);
+
+    List<User> findFirstByNameOrderByIdDescEmailAsc(String name);
+
+    List<User> findFirstByName(String name , Sort sort);
+
+    //Page 객체는 페이징 응답값을 담고 Pageble 은 페이지 요청 값을 담는다.
+    Page<User> findByName(String name, Pageable pageable);
+
+    //nativeQuery 사용
+    @Query(value = "select * from user limit 1",nativeQuery = true)
+    Map<String,Object> findRowRecode();
+
 }

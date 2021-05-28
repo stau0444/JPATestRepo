@@ -1,24 +1,29 @@
 package com.ugo.jpatest.repository;
 
+import com.fasterxml.jackson.core.JsonGenerator;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.jayway.jsonpath.JsonPath;
+import com.jayway.jsonpath.internal.JsonFormatter;
+import com.ugo.jpatest.domain.Gender;
 import com.ugo.jpatest.domain.User;
-import org.aspectj.lang.annotation.Before;
-import org.assertj.core.util.Lists;
+import com.ugo.jpatest.dto.Content;
+import com.ugo.jpatest.dto.PageDto;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.domain.*;
+import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
 import javax.transaction.Transactional;
-import java.sql.SQLOutput;
 import java.time.LocalDateTime;
-import java.time.Year;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
-import static org.junit.jupiter.api.Assertions.*;
-import static org.springframework.data.domain.ExampleMatcher.GenericPropertyMatchers.endsWith;
+import static org.springframework.data.domain.Sort.Order.asc;
+import static org.springframework.data.domain.Sort.Order.desc;
 
 @SpringBootTest
 class UserRepositoryTest {
@@ -26,13 +31,16 @@ class UserRepositoryTest {
     @Autowired
     private UserRepository userRepository;
 
-    @BeforeEach
-    public void insertUser(){
-        for(int i = 1 ; i <=5 ; i++){
-            User user = new User((long) i,"ugo","ugo"+i+".com", LocalDateTime.now(),LocalDateTime.now());
-            userRepository.save(user);
-        }
-    }
+    @Autowired
+    ObjectMapper objectMapper;
+
+//    @BeforeEach
+//    public void insertUser(){
+//        for(int i = 1 ; i <=5 ; i++){
+//            User user = new User((long) i,"ugo","ugo"+i+".com", LocalDateTime.now(),LocalDateTime.now());
+//            userRepository.save(user);
+//        }
+//    }
 
     @Test
     @Transactional
@@ -241,7 +249,7 @@ class UserRepositoryTest {
     }
 
     @Test
-    void pagingAndSortingWithQueryMethod(){
+    void sortingWithQueryMethod(){
 
         //Top3
         List<User> users = userRepository.findTop3ByName("ugo");
@@ -255,5 +263,88 @@ class UserRepositoryTest {
         ugo.forEach(user -> {
             System.out.println("last: " + user);
         });
+
+        List<User> IdDescEmailAsc = userRepository.findFirstByNameOrderByIdDescEmailAsc("ugo");
+        IdDescEmailAsc.forEach(user -> {
+            System.out.println("IdDescEmailAsc: " + user);
+        });
+
+        //Sort 생성해서 넘겨준다. Order에는 여러가지 넘겨줄 수 있다.
+        List<User> firstByNameSort = userRepository.findFirstByName("ugo", Sort.by(desc("id"),asc("email")));
+        firstByNameSort.forEach(user -> {
+            System.out.println("firstByNameSort: " + user);
+        });
+    }
+
+    @Test
+    void pagingWithQueryMethod() throws JsonProcessingException {
+        //PageRequest로 page 요청정보를 담는다 (Pagable 생성)
+        Page<User> page = userRepository.findByName("ugo", PageRequest.of(0, 2, Sort.by(desc("id"))));
+
+        List<Content> contents = new ArrayList<>();
+        page.getContent().forEach(content->{
+            Content cont = new Content();
+            cont.setCreatedAt(content.getCreatedAt());
+            cont.setEmail(content.getEmail());
+            cont.setId(content.getId());
+            cont.setName(content.getName());
+            cont.setUpdatedAt(content.getUpdatedAt());
+            contents.add(cont);
+        });
+        PageDto pageDto = new PageDto();
+        pageDto.setContents(contents);
+        pageDto.setTotalPages(page.getTotalPages());
+        pageDto.setNumberOfElements(page.getNumberOfElements());
+        pageDto.setTotalElements(pageDto.getTotalElements());
+
+        Map<String,Object> jsonPage = new HashMap<>();
+        jsonPage.put("json_data",pageDto);
+        jsonPage.put("created_by","ugo");
+        //Map을 json String으로 변환
+        String pageResponse = objectMapper.writeValueAsString(jsonPage);
+        //json node 접근
+        JsonNode jsonNode = objectMapper.readTree(pageResponse);
+        System.out.println("createdBy = " + jsonNode.findValue("createdBy"));
+        //json 보기 좋게 변환.
+        System.out.println(JsonFormatter.prettyPrint(pageResponse));
+    }
+
+
+    //@Column의 insertable updatable 옵션을 테스트함.
+    @Test
+    void insertUpdateTest(){
+        User user = new User();
+        user.setName("ugo");
+        user.setEmail("ugo@gmail.com");
+        user.setNickName("hohaha");
+        userRepository.save(user);
+
+        User user2 = userRepository.findById(1L).orElseThrow(RuntimeException::new);
+        user2.setName("ugoasd");
+        user2.setNickName("yuhaha");
+
+        //nickname에 updatable false 를 해놨으니 바뀌지 않아야 한다.
+        userRepository.save(user2);
+
+        //다시 불러본다.
+        User user3 = userRepository.findById(1L).orElseThrow(RuntimeException::new);
+
+
+        Assertions.assertEquals("hohaha",user3.getNickName());
+        System.out.println("user3.getNickName()===="+user3.getNickName());
+    }
+
+    @Test
+    void enumTest(){
+        User user = new User();
+        user.setGender(Gender.MALE);
+        userRepository.save(user);
+
+        userRepository.findAll().forEach(System.out::println);
+
+        Map<String, Object> rowRecode = userRepository.findRowRecode();
+        Object gender = rowRecode.get("gender");
+        System.out.println(gender.toString());
+
     }
 }
