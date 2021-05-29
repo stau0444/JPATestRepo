@@ -1,4 +1,4 @@
-package com.ugo.jpatest.domain;
+package com.ugo.jpatest.domain.entitylistener;
 
 import java.time.LocalDateTime;
 

@@ -1,7 +1,9 @@
 package com.ugo.jpatest.domain;
 
-import jdk.jfr.Enabled;
+import com.ugo.jpatest.domain.entitylistener.*;
+import com.ugo.jpatest.domain.enumType.Gender;
 import lombok.*;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
@@ -15,24 +17,27 @@ Entity 객체 살펴보기
 -이때 @Transient 를 사용한다.
  */
 
-@NoArgsConstructor
-@AllArgsConstructor
-@RequiredArgsConstructor
 @Data
+@ToString(callSuper = true)
+@EqualsAndHashCode(callSuper = true)
+@AllArgsConstructor
+@NoArgsConstructor
+@RequiredArgsConstructor
 @Builder
 @Entity
-@Table(
-        name = "user",
-        indexes = {@Index(columnList = "name")},
-        uniqueConstraints = {@UniqueConstraint(columnNames = {"email"})}
-)
-@EntityListeners(value = TimeStampEntityListener.class)
+@EntityListeners(value = UserEntityListener.class)
+//@Table(
+//        name = "user",
+//        indexes = {@Index(columnList = "name")},
+//        uniqueConstraints = {@UniqueConstraint(columnNames = {"email"})}
+//)
+//@EntityListeners(value = {UserEntityListener.class})
 //@Table은 테이블 이름 , 스키마 같은 것을 지정해야 할 경우에 사용한다 .
 // name에 지정된 테이블로 해당엔티티가 맵핑된다.
 // indexes = DB index를 지정한다 .
 // uniquerConstraints = 유니크 여러 컬럼에 제약조건을 지정할 때 사용한다 .
 //index 같은 경우에는 DB에 인덱스가 지정되 있지 않다면 동작하지 않는다.
-public class User implements Auditable{
+public class User extends BaseEntity{
 
     @Id @GeneratedValue
     //@GeneratedValue 의 타입
@@ -47,17 +52,17 @@ public class User implements Auditable{
     @NonNull
     private String email;
 
-    @Column(updatable = false)
+    //@Column(updatable = false)
     private String nickName;
 
     //@Transient - 영속성 컨텍스트에 관리를 받지 않게된다.
     //DB column이 아닌 객체로서 필요한 데이터를 저장할 수 있다. 객체오 생명주기를 같이한다.
-    @Transient
+    //@Transient
     private String testData;
 
     //기본이 ORDINAL인데 인덱스로 관리하기 Enum이 추가되거나 했을떄 무슨값인지 알 수가 없다 .
     //EnumType.STRING 으로 설정해야한다.
-    @Enumerated(value = EnumType.STRING)
+    //@Enumerated(value = EnumType.STRING)
     private Gender gender;
 
     //@Column(updatable = false)
@@ -68,9 +73,9 @@ public class User implements Auditable{
     //insertable =false 는 인서트시 해당컬럼 데이터를 넣지 않는다.
     //updatable = false 는 updatetl 해당컬럼 데이터를 넣지 않는다.
 
-    private LocalDateTime createdAt;
-    //@Column(insertable = false)
-    private LocalDateTime updatedAt;
+//    private LocalDateTime createdAt;
+//    //@Column(insertable = false)
+//    private LocalDateTime updatedAt;
 
     /*
         Entity Listener 종류

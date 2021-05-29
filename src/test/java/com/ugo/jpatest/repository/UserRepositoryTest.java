@@ -1,26 +1,26 @@
 package com.ugo.jpatest.repository;
 
-import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.jayway.jsonpath.JsonPath;
 import com.jayway.jsonpath.internal.JsonFormatter;
-import com.ugo.jpatest.domain.Gender;
+import com.ugo.jpatest.domain.UserHistory;
+import com.ugo.jpatest.domain.enumType.Gender;
 import com.ugo.jpatest.domain.User;
 import com.ugo.jpatest.dto.Content;
 import com.ugo.jpatest.dto.PageDto;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.domain.*;
-import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
 import javax.transaction.Transactional;
 import java.time.LocalDateTime;
 import java.util.*;
+import java.util.stream.Collectors;
 
 import static org.springframework.data.domain.Sort.Order.*;
 
@@ -33,10 +33,13 @@ class UserRepositoryTest {
     @Autowired
     ObjectMapper objectMapper;
 
+    @Autowired
+    UserHistoryRepository userHistoryRepository;
+
 //    @BeforeEach
 //    public void insertUser(){
 //        for(int i = 1 ; i <=5 ; i++){
-//            User user = new User((long) i,"ugo","ugo"+i+".com", LocalDateTime.now(),LocalDateTime.now());
+//            User user = new User((long) i,"ugo","ugo"+i+".com","ugougo1","sugo",Gender.MALE,LocalDateTime.now(),LocalDateTime.now());
 //            userRepository.save(user);
 //        }
 //    }
@@ -276,25 +279,30 @@ class UserRepositoryTest {
     }
 
     @Test
+
     void pagingWithQueryMethod() throws JsonProcessingException {
         //PageRequest로 page 요청정보를 담는다 (Pagable 생성)
         Page<User> page = userRepository.findByName("ugo", PageRequest.of(0, 2, Sort.by(desc("id"))));
 
-        List<Content> contents = new ArrayList<>();
-        page.getContent().forEach(content->{
-            Content cont = new Content();
-            cont.setCreatedAt(content.getCreatedAt());
-            cont.setEmail(content.getEmail());
-            cont.setId(content.getId());
-            cont.setName(content.getName());
-            cont.setUpdatedAt(content.getUpdatedAt());
-            contents.add(cont);
-        });
-        PageDto pageDto = new PageDto();
-        pageDto.setContents(contents);
-        pageDto.setTotalPages(page.getTotalPages());
-        pageDto.setNumberOfElements(page.getNumberOfElements());
-        pageDto.setTotalElements(pageDto.getTotalElements());
+
+        List<Content> contents = page.getContent().stream()
+                .map(cont -> new Content(cont))
+                .collect(Collectors.toList());
+        System.out.println(contents);
+        //Map을 사용하지 않으면 아래 처럼 사용해야한다.
+        //        page.getContent().forEach(content->{
+//            Content cont = new Content();
+//            cont.setCreatedAt(content.getCreatedAt());
+//            cont.setEmail(content.getEmail());
+//            cont.setId(content.getId());
+//            cont.setName(content.getName());
+//            cont.setUpdatedAt(content.getUpdatedAt());
+//            contents.add(cont);
+//        });
+
+
+        PageDto pageDto = new PageDto(page,contents);
+
 
         Map<String,Object> jsonPage = new HashMap<>();
         jsonPage.put("json_data",pageDto);
@@ -402,5 +410,32 @@ class UserRepositoryTest {
 
         Assertions.assertNotEquals(updatedAt,createdAt);
 
+    }
+
+    @Test
+    void userHistoryTest(){
+        //유저 생성
+        User user = new User();
+        user.setName("ugo");
+        user.setEmail("ugo@gmail.com");
+
+        //인서트 시에 userHistory에 데이터가 복사되어 들어간다.
+        userRepository.save(user);
+
+        //데이터 수정 수정된데이터가 UserHistory에 들어가고 update된다.
+        user.setName("hwang");
+        userRepository.save(user);
+
+        //한번더 수정해 봤다.
+        user.setName("고냥이");
+        userRepository.save(user);
+
+
+        //history의 총 갯수는 3개일 것이다 .
+        List<UserHistory> historyList = userHistoryRepository.findAll();
+        Assertions.assertEquals(3,historyList.size());
+
+
+        historyList.forEach(System.out::println);
     }
 }

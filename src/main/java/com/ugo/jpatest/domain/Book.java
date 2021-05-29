@@ -1,19 +1,23 @@
 package com.ugo.jpatest.domain;
 
+import com.ugo.jpatest.domain.entitylistener.Auditable;
 import lombok.*;
 
+
 import javax.persistence.Entity;
-import javax.persistence.EntityListeners;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
-import java.time.LocalDateTime;
 
+
+//BaseEntity가 상위 클래스이기 때문에 상위크래스의 ToString 과 EqualsAndHashCode 를 사용해야
+//출력이 잘 된다.
+@EqualsAndHashCode(callSuper = true)
+@ToString(callSuper = true)
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-@EntityListeners(value = TimeStampEntityListener.class)
-public class Book implements Auditable{
+public class Book extends BaseEntity implements Auditable{
 
     @Id @GeneratedValue
     private Long id;
@@ -22,23 +26,4 @@ public class Book implements Auditable{
 
     private String author;
 
-    private LocalDateTime createdAt;
-
-    private LocalDateTime updatedAt;
-
-    protected boolean canEqual(final Object other) {
-        return other instanceof Book;
-    }
-
-
-//    @PrePersist
-//    public void prePersist(){
-//        this.setCreatedAt(LocalDateTime.now());
-//        this.setUpdatedAt(LocalDateTime.now());
-//    }
-//
-//    @PreUpdate
-//    public void preUpdate(){
-//        this.setUpdatedAt(LocalDateTime.now());
-//    }
 }

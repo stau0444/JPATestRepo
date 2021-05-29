@@ -7,6 +7,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 import org.springframework.boot.autoconfigure.data.web.SpringDataWebProperties;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 
 import java.util.ArrayList;
@@ -20,8 +21,15 @@ import java.util.List;
 public class PageDto {
 
     private int numberOfElements;
-    private int totalElements;
+    private Long totalElements;
     private int totalPages;
     private List<Content> contents = new ArrayList<>();
 
+
+    public PageDto(Page page, List<Content> content) {
+        this.numberOfElements = page.getNumberOfElements();
+        this.totalElements = page.getTotalElements();
+        this.totalPages = page.getTotalPages();
+        this.contents = content;
+    }
 }
