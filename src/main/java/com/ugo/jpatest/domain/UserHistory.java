@@ -5,10 +5,7 @@ import com.ugo.jpatest.domain.entitylistener.TestEntityListener;
 import com.ugo.jpatest.domain.entitylistener.UserEntityListener;
 import lombok.*;
 
-import javax.persistence.Entity;
-import javax.persistence.EntityListeners;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
+import javax.persistence.*;
 import java.time.LocalDateTime;
 
 @Entity
@@ -18,7 +15,7 @@ import java.time.LocalDateTime;
 @ToString(callSuper = true)
 public class UserHistory extends BaseEntity{
 
-    @Id @GeneratedValue
+    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private Long userId;
     private String name;

@@ -22,7 +22,6 @@ public class BaseEntity implements Auditable {
     private LocalDateTime createdAt;
 
     @LastModifiedDate
-    @Column(name = "last_modified_date")
     private LocalDateTime updatedAt;
 
 }

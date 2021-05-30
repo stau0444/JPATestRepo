@@ -22,7 +22,7 @@ class BookRepositoryTest {
     void bookTest(){
         Book book = new Book();
         book.setName("ugobook");
-        book.setAuthor("ugo");
+        book.setAuthorId(1L);
 
         bookRepository.save(book);
 

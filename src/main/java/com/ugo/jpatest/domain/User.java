@@ -39,7 +39,7 @@ Entity 객체 살펴보기
 //index 같은 경우에는 DB에 인덱스가 지정되 있지 않다면 동작하지 않는다.
 public class User extends BaseEntity{
 
-    @Id @GeneratedValue
+    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     //@GeneratedValue 의 타입
     //시퀀스 던 auto increase 든 transaction 종료시점에 해당기능이 ID를 채워서 DB에 저장한다.
     //IDENTITY : mysql mariaDB 기반의 데이터 베이스일때 많이 사용한다.(auto increase 기능)
