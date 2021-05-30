@@ -25,6 +25,7 @@ class BookReviewInfoInfoRepositoryTest {
         bookReviewInfo.setAverageReviewScore(4.5f);
         bookReviewInfo.setReviewCount(2);
 
+
         bookReviewInfoRepository.save(bookReviewInfo);
 
         BookReviewInfo bookReviewInfo1 = bookReviewInfoRepository.findById(1L).orElseThrow(RuntimeException::new);
@@ -44,13 +45,10 @@ class BookReviewInfoInfoRepositoryTest {
 
         System.out.println("result = " + result);
 
-        //book을 통해 bookReview Info를 가져왔다 .
-        //쿼리를 보면
-        BookReviewInfo result2 = bookRepository
-                .findById(1L)
-                .orElseThrow(RuntimeException::new)
-                .getBookReviewInfo();
-        System.out.println("result2 = " + result2);
+        BookReviewInfo bookReviewInfo = bookRepository.findById(1L).orElseThrow(RuntimeException::new).getBookReviewInfo();
+
+        System.out.println("bookReviewInfo = " + bookReviewInfo);
+
     }
 
 
@@ -59,7 +57,7 @@ class BookReviewInfoInfoRepositoryTest {
         book.setName("ugobook");
         book.setAuthorId(1L);
         book.setPublisherId(1L);
-        System.out.println("book>>>>"+bookRepository.findAll());
+
         return bookRepository.save(book);
     }
 
@@ -76,7 +74,5 @@ class BookReviewInfoInfoRepositoryTest {
             2.찾아낸 reviewInfo안에 book을 훑는다
             3.book에 bookReviewInfo를 훓고 값을 리턴한다 .
          */
-        List<BookReviewInfo> all = bookReviewInfoRepository.findAll();
-        all.forEach(System.out::println);
     }
 }

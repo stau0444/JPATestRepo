@@ -320,25 +320,25 @@ class UserRepositoryTest {
     //@Column의 insertable updatable 옵션을 테스트함.
     @Test
     void insertUpdateTest(){
-        User user = new User();
-        user.setName("ugo");
-        user.setEmail("ugo@gmail.com");
-        user.setNickName("hohaha");
-        userRepository.save(user);
-
-        User user2 = userRepository.findById(1L).orElseThrow(RuntimeException::new);
-        user2.setName("ugoasd");
-        user2.setNickName("yuhaha");
-
-        //nickname에 updatable false 를 해놨으니 바뀌지 않아야 한다.
-        userRepository.save(user2);
-
-        //다시 불러본다.
-        User user3 = userRepository.findById(1L).orElseThrow(RuntimeException::new);
-
-
-        Assertions.assertEquals("hohaha",user3.getNickName());
-        System.out.println("user3.getNickName()===="+user3.getNickName());
+//        User user = new User();
+//        user.setName("ugo");
+//        user.setEmail("ugo@gmail.com");
+//        user.setNickName("hohaha");
+//        userRepository.save(user);
+//
+//        User user2 = userRepository.findById(1L).orElseThrow(RuntimeException::new);
+//        user2.setName("ugoasd");
+//        user2.setNickName("yuhaha");
+//
+//        //nickname에 updatable false 를 해놨으니 바뀌지 않아야 한다.
+//        userRepository.save(user2);
+//
+//        //다시 불러본다.
+//        User user3 = userRepository.findById(1L).orElseThrow(RuntimeException::new);
+//
+//
+//        Assertions.assertEquals("hohaha",user3.getNickName());
+//        System.out.println("user3.getNickName()===="+user3.getNickName());
     }
 
     @Test
@@ -437,5 +437,30 @@ class UserRepositoryTest {
 
 
         historyList.forEach(System.out::println);
+    }
+
+    @Test
+    void userRelationTest(){
+        User user = new User();
+        user.setName("ugo");
+        user.setEmail("ugo@gmail.com");
+        user.setGender(Gender.MALE);
+        userRepository.save(user);
+
+
+        user.setName("hwang");
+        userRepository.save(user);
+
+        user.setEmail("hwang@gmail.com");
+        userRepository.save(user);
+
+        //userHistoryRepository.findAll().forEach(System.out::println);
+
+        //파라미터로 들어가는 이메일을 갖은 유저의 아이디를 찾아내고 해당아이디를 갖는 히스토리를 찾는다.
+//        List<UserHistory> results = userHistoryRepository.findByUserId(
+//                userRepository.findByEmail("hwang@gmail.com").getId());
+        List<UserHistory> results = userRepository.findByEmail("hwang@gmail.com").getUserHistories();
+
+        results.forEach(System.out::println);
     }
 }

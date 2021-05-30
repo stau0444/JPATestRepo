@@ -20,7 +20,7 @@ public class BookReviewInfo extends BaseEntity {
     //OneToOne 의 옵션인 Optioal값이 디폴트로 true 여서 값이 존재할 수도 있고 아닐 수도 있기 떄문에
     //outer join 이 된다.
     //optioal이 false 면 null을 허용하지 않음으로  inner join이 나간다.
-    @OneToOne(optional = false,mappedBy = "bookReviewInfo")
+    @OneToOne(optional = false)
     private Book book;
 
     //평균 평점과 , 리뷰 수에 대해서 null을 허용한다면 Wrapper타입으로 받아도 되지만.  null체크를 안하면 npe 터진다.

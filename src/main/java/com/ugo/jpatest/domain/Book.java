@@ -26,14 +26,18 @@ public class Book extends BaseEntity implements Auditable{
 
     private String name;
 
+    @OneToOne(mappedBy = "book")
+    //연관관계의 주인 mappedBy 옵션을 갖게되고 , 반대편에 어떤 것으로 맵핑이 되어 있는지를 알려줘야한다.
+    //양방향 관계에서 Tostring을 순환 참조하기 때문에 한방향으로만 하던지
+    //@ToString.Exclude  로 toString 을 포함시키지 않게한다
+    @ToString.Exclude
+    private BookReviewInfo bookReviewInfo;
+
     private String category;
 
     private Long authorId;
 
     private Long publisherId;
 
-    @OneToOne
-    @ToString.Exclude
-    private BookReviewInfo bookReviewInfo;
 
 }
