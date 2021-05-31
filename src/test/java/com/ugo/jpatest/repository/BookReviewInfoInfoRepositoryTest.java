@@ -56,7 +56,7 @@ class BookReviewInfoInfoRepositoryTest {
         Book book = new Book();
         book.setName("ugobook");
         book.setAuthorId(1L);
-        book.setPublisherId(1L);
+        //book.setPublisherId(1L);
 
         return bookRepository.save(book);
     }

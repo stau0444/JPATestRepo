@@ -44,9 +44,14 @@ public class User extends BaseEntity{
     //npe를 방지하기 위해 빈 리스트를 초기화 해준다.
     @OneToMany(fetch = FetchType.EAGER)
     @JoinColumn(name = "user_id",insertable = false,updatable = false)
+    @ToString.Exclude
     //엔티티가 어떤 컬럼으로 지정하게 될지를 정한다 . 안 붙히면 중간테이블이 생긴다 .
     //컬럼명을 따로 정해주지 않으면 컬럼명을 활용해서 만든다.
     //user에서 userHistory를 갖고 있는 것은 올바르지 못하다.
     //insertable updatable 를 false로 해주는 것이 좋다 .
     private List<UserHistory> userHistories = new ArrayList<>();
+
+    @OneToMany(mappedBy = "user")
+    @ToString.Exclude
+    private List<Review> reviews = new ArrayList<>();
 }

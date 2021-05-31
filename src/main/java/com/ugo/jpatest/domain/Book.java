@@ -5,6 +5,8 @@ import lombok.*;
 
 
 import javax.persistence.*;
+import java.util.ArrayList;
+import java.util.List;
 
 
 //BaseEntity가 상위 클래스이기 때문에 상위크래스의 ToString 과 EqualsAndHashCode 를 사용해야
@@ -26,6 +28,11 @@ public class Book extends BaseEntity implements Auditable{
 
     private String name;
 
+    private String category;
+
+    private Long authorId;
+
+
     @OneToOne(mappedBy = "book")
     //연관관계의 주인 mappedBy 옵션을 갖게되고 , 반대편에 어떤 것으로 맵핑이 되어 있는지를 알려줘야한다.
     //양방향 관계에서 Tostring을 순환 참조하기 때문에 한방향으로만 하던지
@@ -33,11 +40,13 @@ public class Book extends BaseEntity implements Auditable{
     @ToString.Exclude
     private BookReviewInfo bookReviewInfo;
 
-    private String category;
+    @OneToMany
+    @JoinColumn(name = "book_id")
+    @ToString.Exclude
+    private List<Review> reviews = new ArrayList<>();
 
-    private Long authorId;
-
-    private Long publisherId;
-
+    @ManyToOne
+    @ToString.Exclude
+    private Publisher publisher;
 
 }
